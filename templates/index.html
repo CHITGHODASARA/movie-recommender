@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommender System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { text-align: center; padding: 30px; }
+        .poster { width: 150px; height: 220px; margin: 10px; border-radius: 8px; object-fit: cover; }
+        .movie-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Movie Recommender System</h1>
+    <p>Type or select a movie from the dropdown</p>
+    
+    <select id="movieDropdown" class="form-select w-50 mx-auto">
+        {% for movie in movies %}
+        <option value="{{ movie }}">{{ movie }}</option>
+        {% endfor %}
+    </select>
+    
+    <br>
+    <button id="recommendButton" class="btn btn-danger">Show Recommendation</button>
+    <br><br>
+
+    <div id="recommendations" class="movie-container"></div>
+
+    <script>
+        $(document).ready(function() {
+            $('#recommendButton').click(function() {
+                let selectedMovie = $('#movieDropdown').val();
+                $.ajax({
+                    url: '/recommend',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ movie: selectedMovie }),
+                    success: function(response) {
+                        $('#recommendations').empty();
+                        response.forEach(function(movie) {
+                            $('#recommendations').append(`
+                                <div class="text-center">
+                                    <img src="${movie.poster_path}" class="poster" onerror="this.src='https://via.placeholder.com/150';">
+                                    <br><strong>${movie.title}</strong>
+                                </div>
+                            `);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
